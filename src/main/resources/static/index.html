@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reserve</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #4f46e5;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: #1a1a2e;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .row .field { flex: 1; min-width: 140px; }
+
+    .field { margin-bottom: 12px; }
+    label { display: block; font-size: 0.8rem; font-weight: 600;
+            color: #555; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+    input, select {
+      width: 100%; padding: 9px 12px; border: 1.5px solid #ddd;
+      border-radius: 8px; font-size: 0.95rem; outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: #4f46e5; }
+
+    button {
+      background: #4f46e5; color: #fff; border: none;
+      padding: 10px 20px; border-radius: 8px; font-size: 0.92rem;
+      font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    button:hover { background: #4338ca; }
+    button.secondary {
+      background: #fff; color: #4f46e5;
+      border: 1.5px solid #4f46e5; margin-left: 8px;
+    }
+    button.secondary:hover { background: #eef2ff; }
+    button.danger {
+      background: #ef4444; padding: 5px 12px; font-size: 0.82rem;
+    }
+    button.danger:hover { background: #dc2626; }
+
+    .msg { font-size: 0.85rem; margin-top: 10px; padding: 8px 12px;
+           border-radius: 6px; display: none; }
+    .msg.error { background: #fee2e2; color: #b91c1c; display: block; }
+    .msg.success { background: #d1fae5; color: #065f46; display: block; }
+
+    .auth-toggle { display: flex; gap: 8px; margin-bottom: 18px; }
+    .auth-toggle button { background: #e0e7ff; color: #4338ca; }
+    .auth-toggle button.active { background: #4f46e5; color: #fff; }
+    .auth-toggle button:hover { background: #4f46e5; color: #fff; }
+
+    #topbar {
+      display: none;
+      background: #4f46e5; color: #fff;
+      border-radius: 12px; padding: 14px 20px;
+      margin-bottom: 20px;
+      align-items: center; justify-content: space-between;
+    }
+    #topbar span { font-weight: 600; }
+    #topbar .topbar-left { display: flex; align-items: center; gap: 10px; }
+    #topbar .topbar-currency {
+      background: rgba(255,255,255,0.2); padding: 3px 10px;
+      border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+    }
+    #topbar button { background: rgba(255,255,255,0.2); padding: 7px 16px; }
+    #topbar button:hover { background: rgba(255,255,255,0.35); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { text-align: left; padding: 8px 10px; font-size: 0.75rem;
+         text-transform: uppercase; color: #888; border-bottom: 2px solid #f0f2f5; }
+    td { padding: 10px 10px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    .empty { color: #aaa; font-size: 0.88rem; padding: 20px 0; text-align: center; }
+
+    .budget-list { margin-top: 16px; }
+    .budget-item {
+      display: flex; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #f0f2f5;
+      font-size: 0.92rem;
+    }
+    .budget-item:last-child { border-bottom: none; }
+    .budget-cat { font-weight: 600; }
+    .budget-limit { color: #4f46e5; font-weight: 600; }
+
+    .insight-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .insight-buttons button { flex: 1; min-width: 140px; }
+    .insight-result { background: #f5f3ff; border-radius: 8px; padding: 16px; margin-top: 4px; }
+    .insight-result p { margin-bottom: 8px; font-size: 0.93rem; line-height: 1.6; }
+    .insight-result p:last-child { margin-bottom: 0; }
+
+    #app { display: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>💸 Reserve</h1>
+  <p style="color:#888; margin-bottom:24px; font-size:0.9rem;">
+    Mood-tracked expenses · Story · Mood · Prediction · Gamification
+  </p>
+
+  <!-- AUTH -->
+  <div id="authSection" class="card">
+    <div class="auth-toggle">
+      <button id="showLoginBtn" class="active" onclick="showTab('login')">Log In</button>
+      <button id="showRegisterBtn" onclick="showTab('register')">Register</button>
+    </div>
+
+    <div id="loginForm">
+      <h2>Log In</h2>
+      <div class="field"><label>Username</label>
+        <input id="loginUsername" placeholder="alice" /></div>
+      <div class="field"><label>Password</label>
+        <input id="loginPassword" type="password" placeholder="••••••••" /></div>
+      <button onclick="login()">Log In</button>
+      <div id="loginMsg" class="msg"></div>
+    </div>
+
+    <div id="registerForm" style="display:none">
+      <h2>Register</h2>
+      <div class="row">
+        <div class="field"><label>Username</label>
+          <input id="regUsername" placeholder="alice" /></div>
+        <div class="field"><label>Email</label>
+          <input id="regEmail" type="email" placeholder="alice@example.com" /></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Password</label>
+          <input id="regPassword" type="password" placeholder="••••••••" /></div>
+        <div class="field"><label>Preferred Currency</label>
+          <select id="regCurrency">
+            <option value="USD">USD — US Dollar</option>
+            <option value="INR">INR — Indian Rupee</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="register()">Create Account</button>
+      <div id="registerMsg" class="msg"></div>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="topbar-left">
+      <span id="topbarUsername">👤</span>
+      <span id="topbarCurrency" class="topbar-currency"></span>
+    </div>
+    <button onclick="logout()">Log Out</button>
+  </div>
+
+  <div id="app">
+
+    <!-- ADD EXPENSE -->
+    <div class="card">
+      <h2>➕ Add Expense</h2>
+      <div class="row">
+        <div class="field"><label>Amount</label>
+          <input id="expAmount" type="number" step="0.01" placeholder="45.00" /></div>
+        <div class="field"><label>Category</label>
+          <input id="expCategory" placeholder="Food" /></div>
+      </div>
+      <div class="field"><label>Description</label>
+        <input id="expDesc" placeholder="Optional note" /></div>
+      <div class="row">
+        <div class="field"><label>Date</label>
+          <input id="expDate" type="date" /></div>
+        <div class="field"><label>Mood</label>
+          <select id="expMood">
+            <option value="HAPPY">😊 Happy</option>
+            <option value="EXCITED">🤩 Excited</option>
+            <option value="NEUTRAL">😐 Neutral</option>
+            <option value="STRESSED">😣 Stressed</option>
+            <option value="SAD">😢 Sad</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Payment Method</label>
+        <input id="expPayment" placeholder="Card / Cash / UPI" /></div>
+      <button onclick="addExpense()">Save Expense</button>
+      <div id="expenseMsg" class="msg"></div>
+      <p style="color:#888; font-size:0.82rem; margin-top:10px">
+        Currency is locked to your account — all expenses use your preferred currency.
+      </p>
+    </div>
+
+    <!-- EXPENSE LIST -->
+    <div class="card">
+      <h2>📋 My Expenses</h2>
+      <button class="secondary" style="margin-left:0; margin-bottom:14px"
+              onclick="loadExpenses()">↻ Refresh</button>
+      <div id="expenseList"><p class="empty">No expenses loaded yet.</p></div>
+    </div>
+
+    <!-- BUDGETS -->
+    <div class="card">
+      <h2>🎯 Budgets</h2>
+      <div class="row">
+        <div class="field"><label>Category</label>
+          <input id="budgetCategory" placeholder="Food" /></div>
+        <div class="field"><label>Monthly Limit</label>
+          <input id="budgetLimit" type="number" step="0.01" placeholder="300.00" /></div>
+      </div>
+      <button onclick="saveBudget()">Save Budget</button>
+      <div id="budgetMsg" class="msg"></div>
+      <p style="color:#888; font-size:0.82rem; margin-top:10px">
+        Budgets use your account's preferred currency automatically.
+      </p>
+      <div class="budget-list" id="budgetList"></div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="card">
+      <h2>💡 Insights</h2>
+      <div class="field" style="max-width:200px; margin-bottom:16px">
+        <label>Month</label>
+        <input id="insightMonth" type="month" />
+      </div>
+      <div class="insight-buttons">
+        <button onclick="getInsight('story')">📖 Story</button>
+        <button onclick="getInsight('mood')">🎭 Mood</button>
+        <button onclick="getInsight('prediction')">🔮 Prediction</button>
+        <button onclick="getInsight('gamification')">🏆 Streaks</button>
+      </div>
+      <div id="insightResult"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let accessToken       = null;
+  let refreshToken      = null;
+  let preferredCurrency = 'USD'; // default until /auth/me loads
+
+  const SYMBOL  = { 'USD': '$', 'INR': '₹' };
+
+  const MOOD_EMOJI = {
+    HAPPY:    '😊', EXCITED: '🤩', NEUTRAL: '😐',
+    STRESSED: '😣', SAD:     '😢',
+  };
+
+  // ── helpers ──────────────────────────────────────────────────
+
+  function showTab(tab) {
+    document.getElementById('loginForm').style.display    = tab === 'login'    ? '' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('showLoginBtn').classList.toggle('active',    tab === 'login');
+    document.getElementById('showRegisterBtn').classList.toggle('active', tab === 'register');
+  }
+
+  function showMsg(id, text, isError) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + (isError ? 'error' : 'success');
+  }
+
+  function clearMsg(id) {
+    const el = document.getElementById(id);
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  async function api(path, method = 'GET', body = null, auth = true) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth && accessToken) headers['Authorization'] = 'Bearer ' + accessToken;
+    const opts = { method, headers };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(path, opts);
+    if (res.status === 204) return null;
+    const data = await res.json();
+    if (!res.ok) {
+      const msg = data.error || data.message || data.errors?.[0] || 'Something went wrong.';
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  async function loadProfile() {
+    const data = await api('/auth/me');
+    preferredCurrency = data.preferredCurrency;
+    document.getElementById('topbarCurrency').textContent = SYMBOL[preferredCurrency] || '$';
+  }
+
+  function setLoggedIn(username) {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('topbar').style.display      = 'flex';
+    document.getElementById('app').style.display         = 'block';
+    document.getElementById('topbarUsername').textContent = '👤 ' + username;
+
+    document.getElementById('expDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('insightMonth').value = new Date().toISOString().slice(0, 7);
+
+    // Fetch the user's currency and display it in the top bar
+    loadProfile().then(() => {
+      loadExpenses();
+      loadBudgets();
+    });
+  }
+
+  function setLoggedOut() {
+    accessToken  = null;
+    refreshToken = null;
+    preferredCurrency = 'USD';
+    document.getElementById('authSection').style.display = '';
+    document.getElementById('topbar').style.display      = 'none';
+    document.getElementById('app').style.display         = 'none';
+    showTab('login');
+  }
+
+  // ── auth ─────────────────────────────────────────────────────
+
+  async function register() {
+    clearMsg('registerMsg');
+    try {
+      const data = await api('/auth/register', 'POST', {
+        username:          document.getElementById('regUsername').value.trim(),
+        password:          document.getElementById('regPassword').value,
+        email:             document.getElementById('regEmail').value.trim(),
+        preferredCurrency: document.getElementById('regCurrency').value,
+      }, false);
+      accessToken  = data.accessToken;
+      refreshToken = data.refreshToken;
+      setLoggedIn(data.username);
+    } catch (e) { showMsg('registerMsg', e.message, true); }
+  }
+
+  async function login() {
+    clearMsg('loginMsg');
+    try {
+      const data = await api('/auth/login', 'POST', {
+        username: document.getElementById('loginUsername').value.trim(),
+        password: document.getElementById('loginPassword').value,
+      }, false);
+      accessToken  = data.accessToken;
+      refreshToken = data.refreshToken;
+      setLoggedIn(data.username);
+    } catch (e) { showMsg('loginMsg', e.message, true); }
+  }
+
+  async function logout() {
+    try { await api('/auth/logout', 'POST'); } catch (_) {}
+    setLoggedOut();
+  }
+
+  // ── expenses ─────────────────────────────────────────────────
+
+  async function addExpense() {
+    clearMsg('expenseMsg');
+    try {
+      await api('/expenses', 'POST', {
+        amount:        parseFloat(document.getElementById('expAmount').value),
+        category:      document.getElementById('expCategory').value.trim(),
+        description:   document.getElementById('expDesc').value.trim(),
+        date:          document.getElementById('expDate').value,
+        mood:          document.getElementById('expMood').value,
+        paymentMethod: document.getElementById('expPayment').value.trim(),
+      });
+      showMsg('expenseMsg', 'Expense saved!', false);
+      document.getElementById('expAmount').value = '';
+      document.getElementById('expDesc').value   = '';
+      loadExpenses();
+    } catch (e) { showMsg('expenseMsg', e.message, true); }
+  }
+
+  async function loadExpenses() {
+    const container = document.getElementById('expenseList');
+    try {
+      const data = await api('/expenses?page=0&size=50');
+      const expenses = data.content;
+
+      if (!expenses || expenses.length === 0) {
+        container.innerHTML = '<p class="empty">No expenses yet. Add one above!</p>';
+        return;
+      }
+
+      let html = `<table>
+        <thead><tr>
+          <th>Date</th><th>Category</th><th>Amount</th><th>Mood</th><th>Note</th><th></th>
+        </tr></thead><tbody>`;
+
+      for (const e of expenses) {
+        const emoji  = MOOD_EMOJI[e.mood] || '';
+        const symbol = SYMBOL[e.currency] || '$';
+        html += `<tr>
+          <td>${e.date}</td>
+          <td>${e.category}</td>
+          <td>${symbol}${parseFloat(e.amount).toFixed(2)}</td>
+          <td>${emoji} ${e.mood}</td>
+          <td style="color:#888">${e.description || '—'}</td>
+          <td><button class="danger" onclick="deleteExpense(${e.id})">✕</button></td>
+        </tr>`;
+      }
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } catch (e) {
+      container.innerHTML = `<p class="empty" style="color:#ef4444">${e.message}</p>`;
+    }
+  }
+
+  async function deleteExpense(id) {
+    if (!confirm('Delete this expense?')) return;
+    try {
+      await api('/expenses/' + id, 'DELETE');
+      loadExpenses();
+    } catch (e) { alert('Could not delete: ' + e.message); }
+  }
+
+  // ── budgets ──────────────────────────────────────────────────
+
+  async function saveBudget() {
+    clearMsg('budgetMsg');
+    try {
+      await api('/budgets', 'POST', {
+        category:     document.getElementById('budgetCategory').value.trim(),
+        monthlyLimit: parseFloat(document.getElementById('budgetLimit').value),
+      });
+      showMsg('budgetMsg', 'Budget saved!', false);
+      document.getElementById('budgetCategory').value = '';
+      document.getElementById('budgetLimit').value    = '';
+      loadBudgets();
+    } catch (e) { showMsg('budgetMsg', e.message, true); }
+  }
+
+  async function loadBudgets() {
+    const container = document.getElementById('budgetList');
+    try {
+      const budgets = await api('/budgets');
+      if (!budgets || budgets.length === 0) {
+        container.innerHTML = '<p class="empty">No budgets set yet.</p>';
+        return;
+      }
+      container.innerHTML = budgets.map(b => {
+        const symbol = SYMBOL[b.currency] || '$';
+        return `<div class="budget-item">
+          <span class="budget-cat">${b.category}</span>
+          <span class="budget-limit">${symbol}${parseFloat(b.monthlyLimit).toFixed(2)} / month</span>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      container.innerHTML = `<p class="empty" style="color:#ef4444">${e.message}</p>`;
+    }
+  }
+
+  // ── insights ──────────────────────────────────────────────────
+
+  async function getInsight(type) {
+    const month  = document.getElementById('insightMonth').value;
+    const result = document.getElementById('insightResult');
+
+    if (!month) {
+      result.innerHTML = '<div class="insight-result"><p>Please select a month first.</p></div>';
+      return;
+    }
+
+    result.innerHTML = '<div class="insight-result"><p style="color:#888">Loading…</p></div>';
+
+    try {
+      const data = await api(`/insights/${type}?month=${month}`);
+      const messages = data.messages || [];
+
+      const labels = {
+        story:         '📖 Story',
+        mood:          '🎭 Mood Insight',
+        prediction:    '🔮 Prediction',
+        gamification:  '🏆 Budget Streaks',
+      };
+
+      result.innerHTML = `
+        <div class="insight-result">
+          <strong style="display:block; margin-bottom:10px; color:#4f46e5">
+            ${labels[type] || type.toUpperCase()}
+          </strong>
+          ${messages.map(m => `<p>• ${m}</p>`).join('')}
+        </div>`;
+    } catch (e) {
+      result.innerHTML = `<div class="insight-result">
+        <p style="color:#ef4444">${e.message}</p></div>`;
+    }
+  }
+</script>
+</body>
+</html>
