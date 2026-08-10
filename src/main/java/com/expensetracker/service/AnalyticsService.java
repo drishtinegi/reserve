@@ -5,7 +5,6 @@ import com.expensetracker.entity.Expense;
 import com.expensetracker.entity.Expense.Mood;
 import com.expensetracker.repository.BudgetRepository;
 import com.expensetracker.repository.ExpenseRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,11 +25,15 @@ import java.util.stream.Collectors;
  * is ever found.
  */
 @Service
-@RequiredArgsConstructor
 public class AnalyticsService {
 
     private final ExpenseRepository expenseRepository;
     private final BudgetRepository budgetRepository;
+
+    public AnalyticsService(ExpenseRepository expenseRepository, BudgetRepository budgetRepository) {
+        this.expenseRepository = expenseRepository;
+        this.budgetRepository = budgetRepository;
+    }
 
     // ── Core helper: fetch all expenses for a user in a given month ──────────
 

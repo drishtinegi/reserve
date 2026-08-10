@@ -7,7 +7,6 @@ import com.expensetracker.entity.User;
 import com.expensetracker.exception.ResourceNotFoundException;
 import com.expensetracker.repository.ExpenseRepository;
 import com.expensetracker.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,11 +19,15 @@ import java.util.List;
  * Controllers never touch the repository directly.
  */
 @Service
-@RequiredArgsConstructor
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final UserRepository userRepository;
+
+    public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository) {
+        this.expenseRepository = expenseRepository;
+        this.userRepository = userRepository;
+    }
 
     public ExpenseResponse create(Long userId, ExpenseRequest req) {
         // Always derive currency from the user's account — never trust the request body

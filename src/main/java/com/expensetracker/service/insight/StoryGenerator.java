@@ -5,7 +5,6 @@ import com.expensetracker.entity.CurrencyFormatter;
 import com.expensetracker.exception.ResourceNotFoundException;
 import com.expensetracker.repository.UserRepository;
 import com.expensetracker.service.AnalyticsService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,11 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class StoryGenerator implements InsightGenerator {
 
     private final AnalyticsService analyticsService;
     private final UserRepository userRepository;
+
+    public StoryGenerator(AnalyticsService analyticsService, UserRepository userRepository) {
+        this.analyticsService = analyticsService;
+        this.userRepository = userRepository;
+    }
 
     private static final DateTimeFormatter MONTH_FORMAT =
             DateTimeFormatter.ofPattern("MMMM yyyy");

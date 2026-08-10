@@ -9,7 +9,6 @@ import com.expensetracker.security.RefreshTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Register, log in, refresh access tokens, and log out")
 public class AuthController {
 
@@ -27,6 +25,16 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+
+    public AuthController(UserRepository userRepository,
+                          PasswordEncoder passwordEncoder,
+                          JwtService jwtService,
+                          RefreshTokenService refreshTokenService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
+    }
 
     @Operation(summary = "Register a new user — returns a short-lived access token and a refresh token")
     @PostMapping("/register")

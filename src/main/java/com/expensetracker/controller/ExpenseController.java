@@ -7,7 +7,6 @@ import com.expensetracker.service.ExpenseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,12 +20,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/expenses")
-@RequiredArgsConstructor
 @Tag(name = "Expenses", description = "Create, read, update, and delete expenses for the logged-in user")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
     private final UserRepository userRepository;
+
+    public ExpenseController(ExpenseService expenseService, UserRepository userRepository) {
+        this.expenseService = expenseService;
+        this.userRepository = userRepository;
+    }
 
     @Operation(summary = "Create a new expense — include amount, category, date, mood, and currency")
     @PostMapping

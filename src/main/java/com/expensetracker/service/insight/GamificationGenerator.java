@@ -3,7 +3,6 @@ package com.expensetracker.service.insight;
 import com.expensetracker.entity.Budget;
 import com.expensetracker.repository.BudgetRepository;
 import com.expensetracker.service.AnalyticsService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
@@ -21,11 +20,15 @@ import java.util.List;
  * This class never touches ExpenseRepository or BudgetRepository for totals.
  */
 @Service
-@RequiredArgsConstructor
 public class GamificationGenerator implements InsightGenerator {
 
     private final AnalyticsService analyticsService;
     private final BudgetRepository budgetRepository;
+
+    public GamificationGenerator(AnalyticsService analyticsService, BudgetRepository budgetRepository) {
+        this.analyticsService = analyticsService;
+        this.budgetRepository = budgetRepository;
+    }
 
     // How far back to look when counting a streak
     private static final int MAX_STREAK_LOOKBACK = 12;

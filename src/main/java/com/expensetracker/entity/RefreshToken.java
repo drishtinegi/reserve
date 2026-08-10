@@ -1,15 +1,11 @@
 package com.expensetracker.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "refresh_tokens")
-@Getter @Setter @NoArgsConstructor
 public class RefreshToken {
 
     @Id
@@ -27,4 +23,18 @@ public class RefreshToken {
     // When this token expires — checked on every /auth/refresh call
     @Column(nullable = false)
     private Instant expiryDate;
+
+    public RefreshToken() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
+    public Instant getExpiryDate() { return expiryDate; }
+    public void setExpiryDate(Instant expiryDate) { this.expiryDate = expiryDate; }
 }

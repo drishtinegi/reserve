@@ -3,7 +3,6 @@ package com.expensetracker.security;
 import com.expensetracker.entity.RefreshToken;
 import com.expensetracker.exception.ResourceNotFoundException;
 import com.expensetracker.repository.RefreshTokenRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +20,13 @@ import java.util.UUID;
  *   deleteByUserId() — wipe all tokens for a user (used on logout)
  */
 @Service
-@RequiredArgsConstructor
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository) {
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     @Value("${jwt.refresh-expiration-days}")
     private long refreshExpirationDays;

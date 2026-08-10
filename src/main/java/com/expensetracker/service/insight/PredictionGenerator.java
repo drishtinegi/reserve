@@ -5,7 +5,6 @@ import com.expensetracker.entity.CurrencyFormatter;
 import com.expensetracker.exception.ResourceNotFoundException;
 import com.expensetracker.repository.UserRepository;
 import com.expensetracker.service.AnalyticsService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,11 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class PredictionGenerator implements InsightGenerator {
 
     private final AnalyticsService analyticsService;
     private final UserRepository userRepository;
+
+    public PredictionGenerator(AnalyticsService analyticsService, UserRepository userRepository) {
+        this.analyticsService = analyticsService;
+        this.userRepository = userRepository;
+    }
 
     private static final int MONTHS_BACK = 6;
     private static final int MONTHS_FORWARD = 6;

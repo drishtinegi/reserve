@@ -6,7 +6,6 @@ import com.expensetracker.entity.Expense.Mood;
 import com.expensetracker.exception.ResourceNotFoundException;
 import com.expensetracker.repository.UserRepository;
 import com.expensetracker.service.AnalyticsService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,11 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class MoodInsightGenerator implements InsightGenerator {
 
     private final AnalyticsService analyticsService;
     private final UserRepository userRepository;
+
+    public MoodInsightGenerator(AnalyticsService analyticsService, UserRepository userRepository) {
+        this.analyticsService = analyticsService;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public String type() { return "MOOD"; }

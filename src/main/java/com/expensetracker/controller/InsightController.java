@@ -5,7 +5,6 @@ import com.expensetracker.service.insight.InsightGenerator;
 import com.expensetracker.service.insight.InsightResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,12 +15,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/insights")
-@RequiredArgsConstructor
 @Tag(name = "Insights", description = "AI-style spending insights: story, mood, prediction, gamification")
 public class InsightController {
 
     private final List<InsightGenerator> generators;
     private final UserRepository userRepository;
+
+    public InsightController(List<InsightGenerator> generators, UserRepository userRepository) {
+        this.generators = generators;
+        this.userRepository = userRepository;
+    }
 
     @Operation(summary = "Monthly narrative recap — top category, total spend, month-over-month change")
     @GetMapping("/story")

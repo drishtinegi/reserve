@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,12 +21,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/budgets")
-@RequiredArgsConstructor
 @Tag(name = "Budgets", description = "Create and view monthly category budgets")
 public class BudgetController {
 
     private final BudgetRepository budgetRepository;
     private final UserRepository userRepository;
+
+    public BudgetController(BudgetRepository budgetRepository, UserRepository userRepository) {
+        this.budgetRepository = budgetRepository;
+        this.userRepository = userRepository;
+    }
 
     // Currency is intentionally absent from this request — it is always
     // derived from the logged-in user's preferredCurrency, same as expenses.
